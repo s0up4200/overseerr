@@ -330,7 +330,7 @@ class AvailabilitySync {
           media.mediaType === 'movie' ? 'movie' : 'show'
         } [TMDB ID ${media.tmdbId}] was not found in any ${
           media.mediaType === 'movie' ? 'Radarr' : 'Sonarr'
-        } and Plex instance. Status will be changed to unknown.`,
+        } and Plex instance. Status will be changed to deleted.`,
         { label: 'AvailabilitySync' }
       );
 
