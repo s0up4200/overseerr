@@ -238,7 +238,6 @@ class AvailabilitySync {
         where: whereOptions,
         skip: offset,
         take: pageSize,
-        order: { id: 'DESC' },
       }));
       offset += pageSize;
     } while (mediaPage.length > 0);
