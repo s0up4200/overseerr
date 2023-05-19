@@ -3,7 +3,7 @@ import PlexAPI from '@server/api/plexapi';
 import RadarrAPI, { type RadarrMovie } from '@server/api/servarr/radarr';
 import type { SonarrSeason, SonarrSeries } from '@server/api/servarr/sonarr';
 import SonarrAPI from '@server/api/servarr/sonarr';
-import { MediaRequestStatus, MediaStatus } from '@server/constants/media';
+import { MediaStatus } from '@server/constants/media';
 import { getRepository } from '@server/datasource';
 import Media from '@server/entity/Media';
 import MediaRequest from '@server/entity/MediaRequest';
@@ -202,6 +202,9 @@ class AvailabilitySync {
           ) {
             await this.mediaUpdater(media, true);
           }
+        }
+        if (!mediaExists || didDeleteSeasons) {
+          await mediaRepository.save(media);
         }
       }
     } catch (ex) {
