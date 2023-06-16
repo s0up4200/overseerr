@@ -725,4 +725,5 @@ class AvailabilitySync {
 }
 
 const availabilitySync = new AvailabilitySync();
+
 export default availabilitySync;
