@@ -3,7 +3,7 @@ import PlexAPI from '@server/api/plexapi';
 import RadarrAPI, { type RadarrMovie } from '@server/api/servarr/radarr';
 import type { SonarrSeason, SonarrSeries } from '@server/api/servarr/sonarr';
 import SonarrAPI from '@server/api/servarr/sonarr';
-import { MediaStatus } from '@server/constants/media';
+import { MediaRequestStatus, MediaStatus } from '@server/constants/media';
 import { getRepository } from '@server/datasource';
 import Media from '@server/entity/Media';
 import MediaRequest from '@server/entity/MediaRequest';
@@ -203,8 +203,8 @@ class AvailabilitySync {
             await this.mediaUpdater(media, true);
           }
         }
-        if (!mediaExists || didDeleteSeasons) {
-          await mediaRepository.save(media);
+        if (!mediaExists) {
+          await mediaRepository.save({ media, ...media });
         }
       }
     } catch (ex) {
@@ -487,6 +487,14 @@ class AvailabilitySync {
       }
     }
 
+    if ((!radarr || !radarr.hasFile) && !existsInPlex) {
+      movieExists = false;
+    }
+
+    if ((!radarr4k || !radarr4k.hasFile) && !existsInPlex4k) {
+      movieExists4k = false;
+    }
+
     return existsInRadarr;
   }
 
@@ -538,6 +546,25 @@ class AvailabilitySync {
           );
         }
       }
+    }
+
+    if (
+      (!sonarr || sonarr.statistics.episodeFileCount === 0) &&
+      !existsInPlex
+    ) {
+      showExists = false;
+    }
+
+    if (
+      (!sonarr4k || sonarr4k.statistics.episodeFileCount === 0) &&
+      !existsInPlex4k
+    ) {
+      showExists4k = false;
+    }
+
+    // Here we check each season for availability
+    for (const season of media.seasons) {
+      await this.seasonExists(media, season, showExists, showExists4k);
     }
 
     // Here we check each season for availability
